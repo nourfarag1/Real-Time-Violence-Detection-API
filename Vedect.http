@@ -1,0 +1,6 @@
+@Vedect_HostAddress = http://localhost:5296
+
+GET {{Vedect_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
