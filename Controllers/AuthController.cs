@@ -53,7 +53,7 @@ namespace Vedect.Controllers
 
             if (users.Count >= 1)
             {
-                return BadRequest("You cannot have more than two accounts with the same email.");
+                return BadRequest("You cannot have more than one accounts with the same email.");
             }
 
             try
