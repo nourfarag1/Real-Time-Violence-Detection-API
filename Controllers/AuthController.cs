@@ -49,6 +49,13 @@ namespace Vedect.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
+            var users = await _userManager.Users.Where(u => u.Email == dto.Email).ToListAsync();
+
+            if (users.Count >= 1)
+            {
+                return BadRequest("You cannot have more than two accounts with the same email.");
+            }
+
             try
             {
                 await _userRegistrationService.RegisterUserAsync(dto);
@@ -65,11 +72,6 @@ namespace Vedect.Controllers
         {
             // Find users by email
             var users = await _userManager.Users.Where(u => u.Email == dto.Email).ToListAsync();
-
-            if (users.Count > 2)
-            {
-                return BadRequest("You cannot have more than two accounts with the same email.");
-            }
 
             var user = users.Where(x => x.IsEmailVerified == false).SingleOrDefault(); // We can safely assume at least one user will be found here.
 
