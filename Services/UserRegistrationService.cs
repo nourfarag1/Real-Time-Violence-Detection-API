@@ -37,9 +37,9 @@ namespace Vedect.Services
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            var role = dto.Role ?? "Admin";
+            var defaultRole = "User";
 
-            await _userManager.AddToRoleAsync(user, role);
+            await _userManager.AddToRoleAsync(user, defaultRole);
 
             await _emailSender.SendVerificationEmailAsync(user.Email, user.VerificationCode);
         }
