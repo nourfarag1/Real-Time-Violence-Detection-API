@@ -51,7 +51,7 @@ namespace Vedect.Controllers
         {
             var users = await _userManager.Users.Where(u => u.Email == dto.Email).ToListAsync();
 
-            if (users.Count >= 2    )
+            if (users.Count >= 1)
             {
                 return BadRequest("You cannot have more than two accounts with the same email.");
             }
