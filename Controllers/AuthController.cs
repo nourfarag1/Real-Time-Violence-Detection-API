@@ -37,7 +37,12 @@ namespace Vedect.Controllers
         {
             var user = await _userManager.FindByNameAsync(login.UserName);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password))
+            if(user == null)
+            {
+                return BadRequest("This username does not exist");
+            }
+
+            if (!await _userManager.CheckPasswordAsync(user, login.Password))
             {
                 return Unauthorized();
             }
@@ -53,7 +58,7 @@ namespace Vedect.Controllers
 
             if (users.Count >= 1)
             {
-                return BadRequest("You cannot have more than two accounts with the same email.");
+                return BadRequest("You cannot have more than one account with the same email.");
             }
 
             try
@@ -63,7 +68,10 @@ namespace Vedect.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Problem(
+                    detail: ex.Message,
+                    statusCode: 401,
+                    title: "BadRequest");
             }
         }
 
