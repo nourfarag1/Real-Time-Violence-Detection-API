@@ -37,7 +37,12 @@ namespace Vedect.Controllers
         {
             var user = await _userManager.FindByNameAsync(login.UserName);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password))
+            if(user == null)
+            {
+                return BadRequest("This username does not exist");
+            }
+
+            if (!await _userManager.CheckPasswordAsync(user, login.Password))
             {
                 return Unauthorized();
             }
