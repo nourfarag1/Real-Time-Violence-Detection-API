@@ -2,7 +2,7 @@
 {
     public class RegisterDto
     {
-        //test
+        //test2
         public string Fullname { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
