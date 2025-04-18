@@ -70,7 +70,7 @@ namespace Vedect.Controllers
             {
                 return Problem(
                     detail: ex.Message,
-                    statusCode: 401,
+                    statusCode: 402,
                     title: "BadRequest");
             }
         }
