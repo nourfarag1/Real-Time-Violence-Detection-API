@@ -61,17 +61,30 @@ namespace Vedect.Controllers
                 return BadRequest("You cannot have more than one account with the same email.");
             }
 
+            var user = await _userManager.Users.Where(u => u.UserName == dto.Username).FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                return Problem(
+                    detail: "Usename already exists",
+                    statusCode: 402,
+                    title: "BadRequest"
+                );
+            }
+
             try
             {
                 await _userRegistrationService.RegisterUserAsync(dto);
                 return Ok(new { message = "A verification code has been sent to your email." });
             }
+
             catch (Exception ex)
             {
                 return Problem(
                     detail: ex.Message,
-                    statusCode: 402,
-                    title: "BadRequest");
+                    statusCode: 401,
+                    title: "BadRequest"
+                );
             }
         }
 
