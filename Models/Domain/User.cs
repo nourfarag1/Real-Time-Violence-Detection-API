@@ -13,5 +13,8 @@ namespace Vedect.Models.Domain
         public bool IsEmailVerified { get; set; }
 
         public string? ConnectionId { get; set; }
+
+        public int SubscriptionPlanId { get; set; }
+        public SubscriptionPlan SubscriptionPlan { get; set; } = null!;
     }
 }
