@@ -22,14 +22,16 @@ namespace Vedect.Controllers
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
         private readonly IUserRegistrationService _userRegistrationService;
+        private readonly JWTService _jwtService;
 
-        public AuthController(UserManager<User> userManager, IEmailSender emailSender, SignInManager<User> signInManager, IUserRegistrationService userRegistrationService, IConfiguration configuration)
+        public AuthController(UserManager<User> userManager, IEmailSender emailSender, SignInManager<User> signInManager, IUserRegistrationService userRegistrationService, IConfiguration configuration, JWTService jWTService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailSender = emailSender;
             _userRegistrationService = userRegistrationService;
+            _jwtService = jWTService;
         }
 
         [HttpPost("login")]
@@ -47,7 +49,7 @@ namespace Vedect.Controllers
                 return Unauthorized();
             }
 
-            var token = await GenerateJwtToken(user);
+            var token = await _jwtService.GenerateJwtToken(user);
             return Ok(new { token });
         }
 
@@ -161,37 +163,6 @@ namespace Vedect.Controllers
             }
 
             return BadRequest("Error creating user account.");
-        }
-
-
-        private async Task<string> GenerateJwtToken(User user)
-        {
-            var roles = await _userManager.GetRolesAsync(user);
-            if (roles == null || !roles.Any())
-            {
-                roles.Add("Client"); // Default role if no role exists
-            }
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim("roles", string.Join(",", roles)) // Add roles as a comma-separated string
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

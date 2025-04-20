@@ -1,0 +1,31 @@
+﻿@page
+@model Vedect.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">User List</h2>
+
+    <a class="btn btn-outline-primary mb-3" asp-page="/Admin/AssignSubscription" href="/Admin/AssignSubscription">Assign Subscription</a>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>User ID</th>
+                <th>Email</th>
+                <th>Subscription Plan</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Email</td>
+                    <td>@user.SubscriptionPlan?.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

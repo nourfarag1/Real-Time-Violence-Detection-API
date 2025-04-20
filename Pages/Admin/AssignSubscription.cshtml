@@ -1,0 +1,57 @@
+﻿@page
+@model Vedect.Pages.Admin.AssignSubscriptionModel
+@{
+    ViewData["Title"] = "Assign Subscription Plan";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Assign Subscription Plan</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Select User</label>
+            @foreach (var user in Model.Users)
+            {
+                <div>
+                    <input type="radio" id="user_@user.Id" name="SelectedUserId" value="@user.Id" />
+                    <label for="user_@user.Id">@user.FullName (@user.Email)</label>
+                </div>
+            }
+            <span asp-validation-for="SelectedUserId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Select Plan</label>
+            <div>
+                <input type="radio" id="plan_0" name="SelectedPlanId" value="0" />
+                <label for="plan_0">UnSubscribed</label>
+            </div>
+            <div>
+                <input type="radio" id="plan_1" name="SelectedPlanId" value="1" />
+                <label for="plan_1">Common</label>
+            </div>
+            <div>
+                <input type="radio" id="plan_2" name="SelectedPlanId" value="2" />
+                <label for="plan_2">Plus</label>
+            </div>
+            <div>
+                <input type="radio" id="plan_3" name="SelectedPlanId" value="3" />
+                <label for="plan_3">Premium</label>
+            </div>
+            <span asp-validation-for="SelectedPlanId" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Assign Plan</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,49 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - Vdect Admin</title>
+
+        <!-- ✅ Bootstrap CSS goes here -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <header class="bg-dark text-white p-3">
+            <div class="container">
+                <h1 class="h4">Vdect Admin Panel</h1>
+            </div>  
+        </header>
+
+        <main class="container mt-4">
+            @RenderBody()
+        </main>
+
+        <footer class="bg-light text-center py-3 mt-5">
+            <div class="container">
+                <span class="text-muted">© 2025 Vdect</span>
+            </div>  
+        </footer>
+        @RenderSection("Scripts", required: false)
+        @section Scripts {
+            <partial name="_ValidationScriptsPartial" />
+            <script>
+                // Manually handle form submission if needed
+                document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
+                    const userId = document.querySelector('[name="SelectedUserId"]').value;
+                    const planId = document.querySelector('[name="SelectedPlanId"]').value;
+
+                    if (!userId || !planId) {
+                        e.preventDefault();
+                        alert('Please select both user and plan');
+                    }
+                });
+            </script>
+        }
+    </body>
+    </html>
+}
