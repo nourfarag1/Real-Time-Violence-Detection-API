@@ -28,6 +28,7 @@ namespace Vedect.Services
                 VerificationCode = GenerateVerificationCode(),
                 VerificationCodeExpiration = DateTime.Now.AddMinutes(10),
                 IsEmailVerified = false,
+                SubscriptionPlanId = 0
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);

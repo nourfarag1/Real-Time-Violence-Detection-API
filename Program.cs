@@ -1,11 +1,17 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Vedect.Data;
 using Vedect.Models.Domain;
 using Vedect.Services;
 using Vedect.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRazorPages();
 
 // Add services to the container.
 
@@ -15,15 +21,35 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("VdectDbConnection")));
 
 builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+    .AddEntityFrameworkStores<AppDbContext>();
 
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
+builder.Services.AddScoped<JWTService>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+});
 
 
 builder.Services.AddTransient<IEmailSender, EmailSender>(); 
@@ -70,6 +96,18 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.MapRazorPages();
+
 app.MapControllers();
+
+//app.MapGet("/test-update", async (AppDbContext db, [FromQuery] string userId, [FromQuery] int planId) =>
+//{
+//    var affected = await db.Database.ExecuteSqlRawAsync(
+//        "UPDATE AspNetUsers SET SubscriptionPlanId = {0} WHERE Id = {1}",
+//        planId,
+//        userId);
+
+//    return $"Updated {affected} rows";
+//});
 
 app.Run();

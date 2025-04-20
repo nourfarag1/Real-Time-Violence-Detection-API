@@ -12,7 +12,7 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250418015545_SubscriptionPlans")]
+    [Migration("20250419153406_SubscriptionPlans")]
     partial class SubscriptionPlans
     {
         /// <inheritdoc />
@@ -161,10 +161,7 @@ namespace Vedect.Migrations
             modelBuilder.Entity("Vedect.Models.Domain.SubscriptionPlan", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AIChunkRetentionHours")
                         .HasColumnType("int");
@@ -196,6 +193,18 @@ namespace Vedect.Migrations
                     b.ToTable("SubscriptionPlans");
 
                     b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            AIChunkRetentionHours = 0,
+                            EnableAIChunkStorage = false,
+                            EnableAIDetection = false,
+                            EnableFullStreamStorage = false,
+                            EnableStreaming = false,
+                            FullStreamRetentionHours = 0,
+                            MaxTotalStorageMB = 0L,
+                            Name = "UnSubscribed"
+                        },
                         new
                         {
                             Id = 1,

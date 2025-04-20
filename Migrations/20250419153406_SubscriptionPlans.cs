@@ -23,8 +23,7 @@ namespace Vedect.Migrations
                 name: "SubscriptionPlans",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EnableStreaming = table.Column<bool>(type: "bit", nullable: false),
                     EnableFullStreamStorage = table.Column<bool>(type: "bit", nullable: false),
@@ -44,6 +43,7 @@ namespace Vedect.Migrations
                 columns: new[] { "Id", "AIChunkRetentionHours", "EnableAIChunkStorage", "EnableAIDetection", "EnableFullStreamStorage", "EnableStreaming", "FullStreamRetentionHours", "MaxTotalStorageMB", "Name" },
                 values: new object[,]
                 {
+                    { 0, 0, false, false, false, false, 0, 0L, "UnSubscribed" },
                     { 1, 0, false, false, true, true, 24, 1024L, "Common" },
                     { 2, 1, true, true, false, false, 0, 512L, "Plus" },
                     { 3, 12, true, true, true, true, 72, 4096L, "Premium" }
@@ -60,7 +60,7 @@ namespace Vedect.Migrations
                 column: "SubscriptionPlanId",
                 principalTable: "SubscriptionPlans",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
