@@ -12,6 +12,8 @@
             }
 
             public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+            
+            public DbSet<UserPlanRequests> UserPlanRequests { get; set; }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
