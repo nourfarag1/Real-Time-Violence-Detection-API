@@ -25,6 +25,10 @@ builder.Services.AddIdentity<User, IdentityRole>()
 
 builder.Services.AddScoped<JWTService>();
 
+builder.Services.Configure<List<AdminAccount>>(builder.Configuration.GetSection("AdminAccounts"));
+
+builder.Services.AddSession();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -100,14 +104,6 @@ app.MapRazorPages();
 
 app.MapControllers();
 
-//app.MapGet("/test-update", async (AppDbContext db, [FromQuery] string userId, [FromQuery] int planId) =>
-//{
-//    var affected = await db.Database.ExecuteSqlRawAsync(
-//        "UPDATE AspNetUsers SET SubscriptionPlanId = {0} WHERE Id = {1}",
-//        planId,
-//        userId);
-
-//    return $"Updated {affected} rows";
-//});
+app.UseSession();
 
 app.Run();

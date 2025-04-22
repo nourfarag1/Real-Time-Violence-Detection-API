@@ -19,18 +19,31 @@ namespace Vedect.Pages.Admin
 
         public List<UserPlanRequests> Requests { get; set; } = new();
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
+
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("AdminUsername")))
+            {
+                return RedirectToPage("/Admin/Login");
+            }
+
             _logger.LogInformation("Fetching user plan requests...");
             Requests = await _db.UserPlanRequests
                 .Include(r => r.User)
                 .Include(r => r.RequestedPlan)
                 .OrderByDescending(r => r.RequestedAt)
                 .ToListAsync();
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string action)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("AdminUsername")))
+            {
+                return RedirectToPage("/Admin/Login");
+            }
+
             _logger.LogInformation("Handling post action: {Action}", action);
 
             if (string.IsNullOrWhiteSpace(action) || (!action.StartsWith("approve_") && !action.StartsWith("reject_")))
@@ -59,7 +72,7 @@ namespace Vedect.Pages.Admin
                 return RedirectToPage();
             }
 
-            if (parts[0] == "approv")
+            if (parts[0] == "approve")
             {
                 _logger.LogInformation("Approving request {RequestId}", requestId);
                 request.Status = "Approved";

@@ -29,13 +29,24 @@ namespace Vedect.Pages.Admin
         public List<User> Users { get; set; } = new();
         public List<SubscriptionPlan> SubscriptionPlans { get; set; } = new();
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("AdminUsername")))
+            {
+                return RedirectToPage("/Admin/Login");
+            }
+
             await LoadDropdownsAsync();
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("AdminUsername")))
+            {
+                return RedirectToPage("/Admin/Login");
+            }
+
             _logger.LogInformation("OnPostAsync called");
             _logger.LogInformation("SelectedUserId: {SelectedUserId}, SelectedPlanId: {SelectedPlanId}", SelectedUserId, SelectedPlanId);
 
