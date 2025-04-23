@@ -17,11 +17,17 @@ namespace Vedect.Pages.Admin
 
         public List<User> Users { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("AdminUsername")))
+            {
+                RedirectToPage("/Admin/Login");
+            }
+
             Users = await _dbContext.Users
                 .Include(u => u.SubscriptionPlan)
                 .ToListAsync();
+            return Page();
         }
     }
 }

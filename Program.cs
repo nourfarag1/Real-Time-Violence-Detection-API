@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 // Add services to the container.
+
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -23,6 +24,10 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddScoped<JWTService>();
+
+builder.Services.Configure<List<AdminAccount>>(builder.Configuration.GetSection("AdminAccounts"));
+
+builder.Services.AddSession();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -50,23 +55,28 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 });
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>(); 
 builder.Services.AddTransient<IUserRegistrationService, UserRegistrationService>();
 
-// Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins()
                .AllowAnyMethod()
-               .AllowAnyHeader();
+               .AllowAnyHeader()
+               .AllowCredentials();
     });
 });
+
+
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -76,29 +86,24 @@ using (var scope = app.Services.CreateScope())
     await RoleSeeder.SeedRoles(scope.ServiceProvider);
 }
 
-// Middleware pipeline
-app.UseSwagger();
-app.UseSwaggerUI();
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-//app.UseHttpsRedirection();
-
-app.UseCors("CorsPolicy");
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapRazorPages();
 
 app.MapControllers();
 
-//app.MapGet("/test-update", async (AppDbContext db, [FromQuery] string userId, [FromQuery] int planId) =>
-//{
-//    var affected = await db.Database.ExecuteSqlRawAsync(
-//        "UPDATE AspNetUsers SET SubscriptionPlanId = {0} WHERE Id = {1}",
-//        planId,
-//        userId);
-
-//    return $"Updated {affected} rows";
-//});
+app.UseSession();
 
 app.Run();

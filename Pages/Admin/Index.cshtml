@@ -8,12 +8,13 @@
     <h2 class="mb-4">User List</h2>
 
     <a class="btn btn-outline-primary mb-3" asp-page="/Admin/AssignSubscription" href="/Admin/AssignSubscription">Assign Subscription</a>
+    <a class="btn btn-outline-primary mb-3" asp-page="/Admin/userPlanRequests" href="/Admin/userPlanRequests">Plan Requests</a>
 
     <table class="table table-striped table-hover">
         <thead class="table-dark">
             <tr>
-                <th>User ID</th>
-                <th>Email</th>
+                <th>User</th>
+                <th>Username</th>
                 <th>Subscription Plan</th>
             </tr>
         </thead>
@@ -21,7 +22,7 @@
             @foreach (var user in Model.Users)
             {
                 <tr>
-                    <td>@user.Id</td>
+                    <td>@user.FullName</td>
                     <td>@user.Email</td>
                     <td>@user.SubscriptionPlan?.Name</td>
                 </tr>
