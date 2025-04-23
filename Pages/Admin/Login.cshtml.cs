@@ -64,7 +64,7 @@ namespace Vedect.Pages.Admin
             byte[] inputBytes = Encoding.UTF8.GetBytes(input);
             byte[] hashBytes = sha256.ComputeHash(inputBytes);
 
-            return Convert.ToHexString(hashBytes).ToLower(); // good!
+            return Convert.ToHexString(hashBytes).ToLower();
         }
     }
 }
