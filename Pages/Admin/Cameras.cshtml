@@ -1,0 +1,42 @@
+﻿@page
+@model Vedect.Pages.Admin.CamerasModel
+@{
+    ViewData["Title"] = "Camera Monitor";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Camera Status</h2>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="text-center">Status</th>
+                <th>Last Checked (UTC)</th>
+                <th>Stream URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cam in Model.Cameras)
+            {
+                <tr>
+                    <td>@cam.CameraName</td>
+                    <td>@cam.CameraType</td>
+                    <td class="text-center">
+                        @if (cam.IsOnline)
+                        {
+                            <span class="badge bg-success">Online</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Offline</span>
+                        }
+                    </td>
+                    <td>@cam.LastChecked.ToString("g")</td>
+                    <td style="max-width:250px;overflow:auto;">@cam.StreamURL</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
