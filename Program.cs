@@ -29,6 +29,8 @@ builder.Services.Configure<List<AdminAccount>>(builder.Configuration.GetSection(
 
 builder.Services.AddSession();
 
+builder.Services.AddHostedService<CameraProcessManager>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
