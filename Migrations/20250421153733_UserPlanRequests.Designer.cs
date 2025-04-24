@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vedect.Data;
 
@@ -11,9 +12,11 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250421153733_UserPlanRequests")]
+    partial class UserPlanRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,14 +338,14 @@ namespace Vedect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminReviewerId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("AdminReviewrId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RequestPlanId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("RequestedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("RequestedPlanId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2");
@@ -351,15 +354,16 @@ namespace Vedect.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SubscriptionPlanId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminReviewerId");
-
-                    b.HasIndex("RequestedPlanId");
+                    b.HasIndex("SubscriptionPlanId");
 
                     b.HasIndex("UserId");
 
@@ -430,13 +434,9 @@ namespace Vedect.Migrations
 
             modelBuilder.Entity("Vedect.Models.Domain.UserPlanRequests", b =>
                 {
-                    b.HasOne("Vedect.Models.Domain.User", "AdminReviewer")
+                    b.HasOne("Vedect.Models.Domain.SubscriptionPlan", "SubscriptionPlan")
                         .WithMany()
-                        .HasForeignKey("AdminReviewerId");
-
-                    b.HasOne("Vedect.Models.Domain.SubscriptionPlan", "RequestedPlan")
-                        .WithMany()
-                        .HasForeignKey("RequestedPlanId")
+                        .HasForeignKey("SubscriptionPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -446,9 +446,7 @@ namespace Vedect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AdminReviewer");
-
-                    b.Navigation("RequestedPlan");
+                    b.Navigation("SubscriptionPlan");
 
                     b.Navigation("User");
                 });

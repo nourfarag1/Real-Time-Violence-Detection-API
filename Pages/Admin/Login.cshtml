@@ -1,0 +1,30 @@
+﻿@page
+@model Vedect.Pages.Admin.LoginModel
+@{
+    ViewData["Title"] = "Admin Login";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Admin Login</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label for="Username" class="form-label">Username</label>
+            <input name="Username" id="Username" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Password" class="form-label">Password</label>
+            <input type="password" name="Password" id="Password" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
