@@ -157,11 +157,16 @@ namespace Vedect.Migrations
 
             modelBuilder.Entity("Vedect.Models.Domain.Camera", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("AuthSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AuthType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CameraName")
                         .IsRequired()
@@ -366,20 +371,18 @@ namespace Vedect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CameraId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CameraId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CameraId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserCameras");
                 });
@@ -495,7 +498,9 @@ namespace Vedect.Migrations
 
                     b.HasOne("Vedect.Models.Domain.User", "User")
                         .WithMany("UserCameras")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Camera");
 

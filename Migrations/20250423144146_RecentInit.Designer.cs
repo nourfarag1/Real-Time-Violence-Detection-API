@@ -12,8 +12,8 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250412181328_intialmigration")]
-    partial class intialmigration
+    [Migration("20250423144146_RecentInit")]
+    partial class RecentInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,127 @@ namespace Vedect.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Vedect.Models.Domain.Camera", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AuthSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AuthType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CameraName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CameraType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastChecked")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StreamURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cameras");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.SubscriptionPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AIChunkRetentionHours")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("EnableAIChunkStorage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableAIDetection")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableFullStreamStorage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableStreaming")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("FullStreamRetentionHours")
+                        .HasColumnType("int");
+
+                    b.Property<long>("MaxTotalStorageMB")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionPlans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            AIChunkRetentionHours = 0,
+                            EnableAIChunkStorage = false,
+                            EnableAIDetection = false,
+                            EnableFullStreamStorage = false,
+                            EnableStreaming = false,
+                            FullStreamRetentionHours = 0,
+                            MaxTotalStorageMB = 0L,
+                            Name = "UnSubscribed"
+                        },
+                        new
+                        {
+                            Id = 1,
+                            AIChunkRetentionHours = 0,
+                            EnableAIChunkStorage = false,
+                            EnableAIDetection = false,
+                            EnableFullStreamStorage = true,
+                            EnableStreaming = true,
+                            FullStreamRetentionHours = 24,
+                            MaxTotalStorageMB = 1024L,
+                            Name = "Common"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AIChunkRetentionHours = 1,
+                            EnableAIChunkStorage = true,
+                            EnableAIDetection = true,
+                            EnableFullStreamStorage = false,
+                            EnableStreaming = false,
+                            FullStreamRetentionHours = 0,
+                            MaxTotalStorageMB = 512L,
+                            Name = "Plus"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AIChunkRetentionHours = 12,
+                            EnableAIChunkStorage = true,
+                            EnableAIDetection = true,
+                            EnableFullStreamStorage = true,
+                            EnableStreaming = true,
+                            FullStreamRetentionHours = 72,
+                            MaxTotalStorageMB = 4096L,
+                            Name = "Premium"
+                        });
+                });
+
             modelBuilder.Entity("Vedect.Models.Domain.User", b =>
                 {
                     b.Property<string>("Id")
@@ -213,6 +334,9 @@ namespace Vedect.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SubscriptionPlanId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -237,7 +361,72 @@ namespace Vedect.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("SubscriptionPlanId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.UserCamera", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CameraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CameraId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCameras");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.UserPlanRequests", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminReviewerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RequestedPlanId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminReviewerId");
+
+                    b.HasIndex("RequestedPlanId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPlanRequests");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -289,6 +478,71 @@ namespace Vedect.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.User", b =>
+                {
+                    b.HasOne("Vedect.Models.Domain.SubscriptionPlan", "SubscriptionPlan")
+                        .WithMany()
+                        .HasForeignKey("SubscriptionPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubscriptionPlan");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.UserCamera", b =>
+                {
+                    b.HasOne("Vedect.Models.Domain.Camera", "Camera")
+                        .WithMany("UserCameras")
+                        .HasForeignKey("CameraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vedect.Models.Domain.User", "User")
+                        .WithMany("UserCameras")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Camera");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.UserPlanRequests", b =>
+                {
+                    b.HasOne("Vedect.Models.Domain.User", "AdminReviewer")
+                        .WithMany()
+                        .HasForeignKey("AdminReviewerId");
+
+                    b.HasOne("Vedect.Models.Domain.SubscriptionPlan", "RequestedPlan")
+                        .WithMany()
+                        .HasForeignKey("RequestedPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vedect.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminReviewer");
+
+                    b.Navigation("RequestedPlan");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.Camera", b =>
+                {
+                    b.Navigation("UserCameras");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.User", b =>
+                {
+                    b.Navigation("UserCameras");
                 });
 #pragma warning restore 612, 618
         }

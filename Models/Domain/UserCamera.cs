@@ -4,10 +4,10 @@
     {
         public int Id { get; set; }
 
-        public int UserId { get; set; }
-        public User User { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public User? User { get; set; }
 
-        public int CameraId { get; set; }
-        public Camera Camera { get; set; }
+        public Guid CameraId { get; set; }
+        public Camera? Camera { get; set; }
     }
 }
