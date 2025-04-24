@@ -11,6 +11,8 @@ using Vedect.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddRazorPages();
 
 // Add services to the container.
@@ -30,6 +32,7 @@ builder.Services.Configure<List<AdminAccount>>(builder.Configuration.GetSection(
 builder.Services.AddSession();
 
 builder.Services.AddHostedService<CameraProcessManager>();
+builder.Services.AddHostedService<CameraPingService>();
 
 builder.Services.AddAuthentication(options =>
 {
