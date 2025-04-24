@@ -5,6 +5,8 @@
         public Guid Id { get; set; }
         public string CameraName { get; set; }
         public string CameraType { get; set; }
+        public int? DeviceIndex { get; set; }
+        public int? IngestPort { get; set; }
         public string StreamURL { get; set; }
         public string AuthType { get; set; }
         public string? AuthSecret { get; set; }
