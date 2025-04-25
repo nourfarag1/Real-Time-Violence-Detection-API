@@ -34,7 +34,9 @@
                         }
                     </td>
                     <td>@cam.LastChecked.ToString("g")</td>
-                    <td style="max-width:250px;overflow:auto;">@cam.StreamURL</td>
+                    <td style="max-width:250px; overflow:auto;">
+                        <a href="@cam.StreamURL" target="_blank">@cam.StreamURL</a>
+                    </td>
                 </tr>
             }
         </tbody>
