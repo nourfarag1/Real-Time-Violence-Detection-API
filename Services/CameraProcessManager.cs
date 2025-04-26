@@ -6,7 +6,7 @@ public class CameraProcessManager : BackgroundService
 {
     private readonly IServiceProvider _sp;
     private readonly Dictionary<Guid, Process> _procs = new();
-    private const int BasePort = 9100;
+    private const int BasePort = 9200;
 
     public CameraProcessManager(IServiceProvider sp) => _sp = sp;
 
@@ -19,8 +19,9 @@ public class CameraProcessManager : BackgroundService
 
             // Get all USB‑type cameras (CameraType == "IVCam")
             var usbCams = await db.Cameras
-                                  .Where(c => c.CameraType == "IVCam")
-                                  .ToListAsync(ct);
+                      .Where(c => c.CameraType == "IVCam")
+                      .AsTracking()
+                      .ToListAsync(ct);
 
             foreach (var cam in usbCams)
             {

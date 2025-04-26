@@ -16,7 +16,7 @@ from flask import Flask, Response
 # --------------------------------------------------------------------------- CLI
 parser = argparse.ArgumentParser()
 parser.add_argument("--index",   type=int, default=0,   help="camera index")
-parser.add_argument("--port",    type=int, default=9000,help="HTTP port")
+parser.add_argument("--port",    type=int, default=9100,help="HTTP port")
 parser.add_argument("--cam-id",  required=True,         help="camera GUID")
 args = parser.parse_args()
 
