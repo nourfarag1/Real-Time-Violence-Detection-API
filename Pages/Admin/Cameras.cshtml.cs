@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Vedect.Data;
@@ -14,10 +15,16 @@ public class CamerasModel : PageModel
 
     public List<Camera> Cameras { get; set; } = new();
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("AdminUsername")))
+        {
+            return RedirectToPage("/Admin/Login");
+        }
+
         Cameras = await _db.Cameras.AsNoTracking()
                                    .OrderBy(c => c.CameraName)
                                    .ToListAsync();
+        return Page();
     }
 }
