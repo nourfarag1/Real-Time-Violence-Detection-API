@@ -3,7 +3,7 @@ using Vedect.Models.Domain;
 using Vedect.Models.DTOs;
 using Vedect.Shared;
 
-namespace Vedect.Services
+namespace Vedect.Services.Core
 {
     public class UserRegistrationService : IUserRegistrationService
     {

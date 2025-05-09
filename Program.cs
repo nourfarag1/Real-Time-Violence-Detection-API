@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Vedect.Data;
 using Vedect.Models.Domain;
-using Vedect.Services;
+using Vedect.Services.Core;
 using Vedect.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,9 +30,6 @@ builder.Services.AddScoped<JWTService>();
 builder.Services.Configure<List<AdminAccount>>(builder.Configuration.GetSection("AdminAccounts"));
 
 builder.Services.AddSession();
-
-builder.Services.AddHostedService<CameraProcessManager>();
-builder.Services.AddHostedService<CameraPingService>();
 
 builder.Services.AddAuthentication(options =>
 {
