@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.WebSockets;
 using System.Security.Claims;
 using Vedect.Data;
+using Vedect.Models.Domain;
 using Vedect.Models.DTOs;
 using Vedect.Repositories.Implementations;
 using Vedect.Repositories.Interfaces;
