@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vedect.Data;
 
@@ -11,9 +12,11 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509140149_Camera_updated_domain_again")]
+    partial class Camera_updated_domain_again
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,15 +31,46 @@ namespace Vedect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("AccessMode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AuthSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AuthType")
+                        .HasColumnType("int");
+
                     b.Property<string>("CameraName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StreamUrl")
+                    b.Property<int>("CameraType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IngestPort")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastChecked")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MacAddress")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("StreamKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StreamURL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MacAddress")
+                        .IsUnique()
+                        .HasFilter("[MacAddress] IS NOT NULL");
 
                     b.ToTable("Cameras");
                 });

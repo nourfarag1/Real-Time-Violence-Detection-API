@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 using System.Security.Claims;
 using Vedect.Data;
 using Vedect.Models.DTOs;
+using Vedect.Repositories.Implementations;
+using Vedect.Repositories.Interfaces;
 
 namespace Vedect.Controllers
 {
@@ -11,34 +15,43 @@ namespace Vedect.Controllers
     [ApiController]
     public class CameraController : ControllerBase
     {
-        private readonly AppDbContext _db;
-
-        public CameraController(AppDbContext db)
+        private readonly ICameraRepo _camRepo;
+        
+        public CameraController(ICameraRepo camRepo)
         {
-            _db = db;
+            _camRepo = camRepo;
         }
 
-        [HttpGet("streams")]
-        public async Task<IActionResult> GetUserCameraStreams()
-        {
+        [HttpPost("add")]
+        [Authorize]
+        public async Task<IActionResult> AddCamera([FromBody] AddCameraRequest request)
+        {   
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-            if(userId == null) 
-                return NotFound("User Not Found");
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID not found in token.");
 
-            var cameras = await _db.UserCameras
-                .Where(uc => uc.UserId == userId)
-                .Include(uc => uc.Camera)
-                .Select(uc => new CameraStreamDto
+            var camera = new Camera
+            {
+                CameraName = request.CameraName,
+                StreamUrl = request.StreamUrl
+            };
+
+            try
+            {
+                var addedCamera = await _camRepo.AddCameraAsync(camera, userId);
+                return Ok(new
                 {
-                    CameraId = uc.Camera.Id,
-                    CameraName = uc.Camera.CameraName,
-                    StreamURL = uc.Camera.StreamURL,
-                    IsOnline = uc.Camera.IsOnline
-                })
-                .ToListAsync();
-
-            return Ok(cameras);
+                    Message = "Camera added successfully.",
+                    CameraId = addedCamera.Id,
+                    CameraName = addedCamera.CameraName,
+                    StreamUrl = addedCamera.StreamUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
+
     }
 }
