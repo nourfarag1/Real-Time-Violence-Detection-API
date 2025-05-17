@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Validations;
 using Vedect.Data;
 using Vedect.Models.Domain;
 using Vedect.Repositories.Interfaces;
@@ -61,5 +62,25 @@ namespace Vedect.Repositories.Implementations
             return camera;
         }
 
+        public async Task<List<Camera>> GetUserCameras(string userId)
+        {
+            var userCameras = await _appDbContext.UserCameras.Where(u => u.UserId == userId)
+                .Select(uc => uc.CameraId).ToListAsync();
+
+            if (userCameras.Count == 0)
+                throw new InvalidOperationException("No cameras found");
+
+            var cameras = new List<Camera>();
+
+            foreach (var usercamera in userCameras)
+            {
+                var camera = _appDbContext.Cameras.Where(c => c.Id == usercamera).FirstOrDefault();
+
+                if (camera != null)
+                    cameras.Add(camera);
+            }
+
+            return cameras;
+        }
     }
 }
