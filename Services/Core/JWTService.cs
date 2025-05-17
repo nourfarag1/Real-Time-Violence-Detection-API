@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Vedect.Models.Domain;
 
-namespace Vedect.Services
+namespace Vedect.Services.Core
 {
     public class JWTService
     {

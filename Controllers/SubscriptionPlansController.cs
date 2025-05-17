@@ -57,7 +57,10 @@ namespace Vedect.Controllers
         [HttpGet("{userId}/status")]
         public async Task<ActionResult<string>> GetPlanRequestStatus(string userId)
         {
-            var status = await _dbContext.UserPlanRequests.Where(x => x.UserId.Equals(userId)).Select(x => x.Status).FirstOrDefaultAsync();
+            var status = await _dbContext.UserPlanRequests
+                .Where(x => x.UserId.Equals(userId))
+                .Select(x => x.Status)
+                .FirstOrDefaultAsync();
 
             if (status == null)
                 return NotFound("Not request found for this userId");

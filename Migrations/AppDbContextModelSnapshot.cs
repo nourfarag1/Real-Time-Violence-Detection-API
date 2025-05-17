@@ -22,6 +22,25 @@ namespace Vedect.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Camera", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CameraName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StreamUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cameras");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -327,6 +346,30 @@ namespace Vedect.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Vedect.Models.Domain.UserCamera", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CameraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CameraId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCameras");
+                });
+
             modelBuilder.Entity("Vedect.Models.Domain.UserPlanRequests", b =>
                 {
                     b.Property<int>("Id")
@@ -428,6 +471,25 @@ namespace Vedect.Migrations
                     b.Navigation("SubscriptionPlan");
                 });
 
+            modelBuilder.Entity("Vedect.Models.Domain.UserCamera", b =>
+                {
+                    b.HasOne("Camera", "Camera")
+                        .WithMany("UserCameras")
+                        .HasForeignKey("CameraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vedect.Models.Domain.User", "User")
+                        .WithMany("UserCameras")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Camera");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Vedect.Models.Domain.UserPlanRequests", b =>
                 {
                     b.HasOne("Vedect.Models.Domain.User", "AdminReviewer")
@@ -451,6 +513,16 @@ namespace Vedect.Migrations
                     b.Navigation("RequestedPlan");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Camera", b =>
+                {
+                    b.Navigation("UserCameras");
+                });
+
+            modelBuilder.Entity("Vedect.Models.Domain.User", b =>
+                {
+                    b.Navigation("UserCameras");
                 });
 #pragma warning restore 612, 618
         }
