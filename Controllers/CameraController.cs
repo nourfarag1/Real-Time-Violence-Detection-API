@@ -53,5 +53,28 @@ namespace Vedect.Controllers
             }
         }
 
+        [HttpGet("UserCameras")]
+        public async Task<IActionResult> GetUserCameras(string userId)
+        {
+            var cameras = await _camRepo.GetUserCameras(userId);
+
+            if (cameras == null)
+                return NotFound("No cameras found!");
+
+            var results = new List<GetUserCamerasRequest>();
+
+            foreach (var cam in cameras)
+            {
+                var result = new GetUserCamerasRequest();
+
+                result.CameraName = cam.CameraName;
+                result.StreamUrl = cam.StreamUrl;
+
+                results.Add(result);
+            }
+
+            return Ok(results);
+        }
+
     }
 }
