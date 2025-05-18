@@ -19,7 +19,9 @@
 
             public DbSet<UserCamera> UserCameras { get; set; }
 
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            public DbSet<CameraStreamSession> CameraStreamsSessions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);
 

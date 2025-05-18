@@ -29,6 +29,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddScoped<ICameraRepo, CameraRepo>();
 
+builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<JWTService>();
 
