@@ -76,6 +76,5 @@ namespace Vedect.Controllers
 
             return Ok(results);
         }
-
     }
 }
