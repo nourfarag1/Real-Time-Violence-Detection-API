@@ -21,6 +21,8 @@
 
             public DbSet<CameraStreamSession> CameraStreamsSessions { get; set; }
 
+            public DbSet<AiProcessingSession> AiProcessingSessions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);
