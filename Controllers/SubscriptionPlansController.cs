@@ -59,7 +59,7 @@ namespace Vedect.Controllers
         {
             var status = await _dbContext.UserPlanRequests.Where(x => x.UserId.Equals(userId)).Select(x => x.Status).FirstOrDefaultAsync();
 
-            if (status == null)
+            if (status == null) 
                 return NotFound("Not request found for this userId");
 
             return Ok(status);

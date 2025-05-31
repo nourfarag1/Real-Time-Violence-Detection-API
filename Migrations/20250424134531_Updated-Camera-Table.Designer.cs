@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vedect.Data;
 
@@ -11,9 +12,11 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424134531_Updated-Camera-Table")]
+    partial class UpdatedCameraTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,25 +24,6 @@ namespace Vedect.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Camera", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CameraName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StreamUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cameras");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -174,62 +158,46 @@ namespace Vedect.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Vedect.Models.Domain.AiProcessingSession", b =>
+            modelBuilder.Entity("Vedect.Models.Domain.Camera", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CameraId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ErrorDetails")
+                    b.Property<string>("AuthSecret")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastMessageFromPipeline")
+                    b.Property<string>("AuthType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StartedAtUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CameraName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
+                    b.Property<string>("CameraType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DeviceIndex")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("IngestPort")
+                        .HasColumnType("int");
 
-                    b.ToTable("AiProcessingSessions");
-                });
-
-            modelBuilder.Entity("Vedect.Models.Domain.CameraStreamSession", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CameraId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("StartedAt")
+                    b.Property<DateTime>("LastChecked")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StreamKey")
+                    b.Property<string>("StreamURL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CameraId");
-
-                    b.ToTable("CameraStreamsSessions");
+                    b.ToTable("Cameras");
                 });
 
             modelBuilder.Entity("Vedect.Models.Domain.SubscriptionPlan", b =>
@@ -518,17 +486,6 @@ namespace Vedect.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vedect.Models.Domain.CameraStreamSession", b =>
-                {
-                    b.HasOne("Camera", "Camera")
-                        .WithMany()
-                        .HasForeignKey("CameraId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Camera");
-                });
-
             modelBuilder.Entity("Vedect.Models.Domain.User", b =>
                 {
                     b.HasOne("Vedect.Models.Domain.SubscriptionPlan", "SubscriptionPlan")
@@ -542,7 +499,7 @@ namespace Vedect.Migrations
 
             modelBuilder.Entity("Vedect.Models.Domain.UserCamera", b =>
                 {
-                    b.HasOne("Camera", "Camera")
+                    b.HasOne("Vedect.Models.Domain.Camera", "Camera")
                         .WithMany("UserCameras")
                         .HasForeignKey("CameraId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -584,7 +541,7 @@ namespace Vedect.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Camera", b =>
+            modelBuilder.Entity("Vedect.Models.Domain.Camera", b =>
                 {
                     b.Navigation("UserCameras");
                 });

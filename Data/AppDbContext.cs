@@ -15,15 +15,23 @@
             
             public DbSet<UserPlanRequests> UserPlanRequests { get; set; }
 
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            public DbSet<Camera> Cameras { get; set; }
+
+            public DbSet<UserCamera> UserCameras { get; set; }
+
+            public DbSet<CameraStreamSession> CameraStreamsSessions { get; set; }
+
+            public DbSet<AiProcessingSession> AiProcessingSessions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);
 
-                modelBuilder.Entity<SubscriptionPlan>()
-                    .Property(p => p.Id)
-                    .ValueGeneratedNever();
+            modelBuilder.Entity<SubscriptionPlan>()
+                .Property(p => p.Id)
+                .ValueGeneratedNever();
 
-                modelBuilder.Entity<SubscriptionPlan>().HasData(
+            modelBuilder.Entity<SubscriptionPlan>().HasData(
                     new SubscriptionPlan
                     {
                         Id = 0,

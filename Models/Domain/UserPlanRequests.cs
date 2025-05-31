@@ -17,5 +17,4 @@
         public string? AdminReviewerId { get; set; }
         public User AdminReviewer { get; set; }
     }
-
 }
