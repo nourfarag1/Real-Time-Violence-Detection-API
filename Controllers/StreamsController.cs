@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Vedect.Data;
+using Vedect.Models.Domain;
 
 namespace Vedect.Controllers
 {
@@ -24,7 +26,17 @@ namespace Vedect.Controllers
             if (camera == null || string.IsNullOrEmpty(camera.StreamUrl))
                 return NotFound("Camera not found or missing streaming URL.");
 
-            var streamKey = $"camera-{camera.Id}-user-1"; // You can customize this logic
+            var existingSession = await _context.CameraStreamsSessions
+                .Where(s => s.CameraId == camera.Id && s.IsActive)
+                .FirstOrDefaultAsync();
+
+            if (existingSession != null)
+            {
+                var existingUrl = $"http://localhost:8080/live/{existingSession.StreamKey}.flv";
+                return Ok(new { message = "Stream already active.", url = existingUrl });
+            }
+
+            var streamKey = $"camera-{camera.Id}-user-1";
 
             var client = _httpClientFactory.CreateClient();
             var payload = new
@@ -38,7 +50,52 @@ namespace Vedect.Controllers
             if (!response.IsSuccessStatusCode)
                 return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
 
-            return Ok(await response.Content.ReadAsStringAsync());
+            var session = new CameraStreamSession
+            {
+                CameraId = camera.Id,
+                StreamKey = streamKey,
+                StartedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+
+            _context.CameraStreamsSessions.Add(session);
+            await _context.SaveChangesAsync();
+
+            var streamUrl = $"http://localhost:8080/live/{streamKey}.flv";
+
+            return Ok(new
+            {
+                message = "Stream started successfully.",
+                url = streamUrl
+            });
         }
+
+
+        [HttpPost("{cameraId}/stop")]
+        public async Task<IActionResult> StopStream(Guid cameraId)
+        {
+            var session = await _context.CameraStreamsSessions
+                .Where(s => s.CameraId == cameraId)
+                .FirstOrDefaultAsync();
+
+            if (session == null)
+                return NotFound("No active stream session found for this camera.");
+
+            var client = _httpClientFactory.CreateClient();
+            var payload = new { stream_key = session.StreamKey };
+
+            var response = await client.PostAsJsonAsync("http://localhost:5001/stop-stream", payload);
+
+            if (!response.IsSuccessStatusCode)
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+
+            session.IsActive = false;
+            session.EndedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Stream stopped successfully.");
+        }
+
     }
 }

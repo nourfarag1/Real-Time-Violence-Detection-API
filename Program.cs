@@ -119,6 +119,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Add services to the container.
+builder.Services.AddHttpClient("AiPipelineClient", client =>
+{
+    // Optional: Set a timeout
+    // client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddSingleton<Vedect.Services.Interfaces.IAiProcessingService, Vedect.Services.Implementations.AiProcessingService>();
 
 var app = builder.Build();
 
