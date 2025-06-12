@@ -23,6 +23,8 @@
 
             public DbSet<AiProcessingSession> AiProcessingSessions { get; set; }
 
+            public DbSet<UserDevice> UserDevices { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);
@@ -81,6 +83,12 @@
                         MaxTotalStorageMB = 4096
                     }
                 );
+            
+            modelBuilder.Entity<UserDevice>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.Devices)
+                .HasForeignKey(ud => ud.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
             }
         }
     }

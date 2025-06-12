@@ -89,13 +89,14 @@ namespace Vedect.Controllers
             if (!response.IsSuccessStatusCode)
                 return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
 
-            session.IsActive = false;
-            session.EndedAt = DateTime.UtcNow;
+            //session.IsActive = false;
+            //session.EndedAt = DateTime.UtcNow;
+
+            _context.CameraStreamsSessions.Remove(session);
 
             await _context.SaveChangesAsync();
 
             return Ok("Stream stopped successfully.");
         }
-
     }
 }
