@@ -41,7 +41,12 @@ public class FirebaseNotificationService : INotificationService
         await _context.SaveChangesAsync();
     }
 
-    public async Task SendNotificationAsync(string userId, string title, string body, bool dryRun = false)
+    public async Task SendNotificationAsync(
+        string userId, 
+        string title, 
+        string body, 
+        Dictionary<string, string>? metadata = null,
+        bool dryRun = false)
     {
         _logger.LogInformation("Attempting to send notification to UserId: {UserId}", userId);
 
@@ -66,12 +71,7 @@ public class FirebaseNotificationService : INotificationService
                 Title = title,
                 Body = body,
             },
-            // Optional: You can add custom data to the notification payload
-            // Data = new Dictionary<string, string>()
-            // {
-            //     { "score", "850" },
-            //     { "time", "2:45" },
-            // },
+            Data = metadata ?? new Dictionary<string, string>()
         };
 
         _logger.LogInformation("Sending multicast message to FCM for UserId: {UserId}. DryRun: {DryRun}", userId, dryRun);

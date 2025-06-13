@@ -37,7 +37,7 @@ public class NotificationConsumerService : IHostedService, IDisposable
                 HostName = _configuration["RabbitMQ:HostName"],
                 UserName = _configuration["RabbitMQ:UserName"],
                 Password = _configuration["RabbitMQ:Password"],
-                DispatchConsumersAsync = true // Important for async consumers
+                DispatchConsumersAsync = true
             };
             
             _connection = factory.CreateConnection();
@@ -47,7 +47,7 @@ public class NotificationConsumerService : IHostedService, IDisposable
 
             var exchangeName = "event_notifications_exchange";
             var queueName = "backend_notifications_queue";
-            var routingKey = "events.violence.*";
+            var routingKey = "events.*.*"; // Changed to catch all event types
 
             _channel.ExchangeDeclare(exchange: exchangeName, type: "topic", durable: true);
             _logger.LogInformation($"Exchange '{exchangeName}' declared.");
@@ -64,17 +64,34 @@ public class NotificationConsumerService : IHostedService, IDisposable
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 
-
                 try
                 {
+                    // First, try to determine the event type from the routing key
+                    var routingKeyParts = ea.RoutingKey.Split('.');
+                    var eventType = routingKeyParts[1]; // e.g., "violence" or "warning"
+
                     var notificationDto = JsonSerializer.Deserialize<ViolenceEventNotification>(message);
                     if (notificationDto != null)
                     {
-                        _logger.LogInformation($"Successfully deserialized event for camera {notificationDto.CameraId}. Processing...");
+                        // Set the event type based on the routing key
+                        notificationDto.EventType = $"{eventType}_detected";
+                        
+                        _logger.LogInformation($"Successfully deserialized {eventType} event for camera {notificationDto.CameraId}. Processing...");
                         
                         using var scope = _scopeFactory.CreateScope();
                         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
                         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                        // Get the notification template for this event type
+                        var template = await dbContext.NotificationTemplates
+                            .FirstOrDefaultAsync(t => t.EventType == notificationDto.EventType && t.IsActive);
+
+                        if (template == null)
+                        {
+                            _logger.LogWarning($"No active template found for event type: {notificationDto.EventType}");
+                            _channel.BasicAck(ea.DeliveryTag, false);
+                            return;
+                        }
 
                         var userIds = await dbContext.UserCameras
                             .Where(uc => uc.CameraId == notificationDto.CameraId)
@@ -86,17 +103,24 @@ public class NotificationConsumerService : IHostedService, IDisposable
                         {
                             _logger.LogInformation($"Found {userIds.Count} users associated with camera {notificationDto.CameraId}. Sending notifications.");
                             
-                            var title = "Violence Alert Detected";
-                            var notificationBody = $"A violence event was detected on one of your cameras. Tap to view the incident.";
+                            // Create metadata dictionary with all the notification data
+                            var metadata = new Dictionary<string, string>
+                            {
+                                { "camera_id", notificationDto.CameraId.ToString() },
+                                { "event_type", notificationDto.EventType },
+                                { "event_timestamp", notificationDto.EventTimestampUtc.ToString("O") },
+                                { "incident_video_url", notificationDto.IncidentVideoUrl },
+                                { "thumbnail_url", notificationDto.ThumbnailUrl },
+                                { "message_version", notificationDto.MessageVersion }
+                            };
                             
                             foreach (var userId in userIds)
                             {
-                                // The notification service already handles finding the specific device tokens for the user.
                                 await notificationService.SendNotificationAsync(
                                     userId, 
-                                    title, 
-                                    notificationBody
-                                    // We could pass more data here if the service supported it, e.g., notificationDto.IncidentVideoUrl
+                                    template.Title, 
+                                    template.Body,
+                                    metadata
                                 );
                             }
                         }
@@ -112,7 +136,7 @@ public class NotificationConsumerService : IHostedService, IDisposable
                 }
                 catch (Exception ex)
                 {
-                     _logger.LogError(ex, "An unexpected error occurred while processing notification for message: {Message}", message);
+                    _logger.LogError(ex, "An unexpected error occurred while processing notification for message: {Message}", message);
                 }
 
                 _channel.BasicAck(ea.DeliveryTag, false);

@@ -9,7 +9,7 @@ public class ViolenceEventNotification
     public Guid CameraId { get; set; }
 
     [JsonPropertyName("event_type")]
-    public string EventType { get; set; }
+    public string EventType { get; set; } // "violence_detected" or "warning_detected"
 
     [JsonPropertyName("event_timestamp_utc")]
     public DateTime EventTimestampUtc { get; set; }
