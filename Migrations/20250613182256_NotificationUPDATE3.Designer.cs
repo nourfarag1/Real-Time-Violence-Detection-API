@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vedect.Data;
 
@@ -11,9 +12,11 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613182256_NotificationUPDATE3")]
+    partial class NotificationUPDATE3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,6 +248,9 @@ namespace Vedect.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EventType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -258,27 +264,12 @@ namespace Vedect.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.ToTable("NotificationTemplates");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Body = "A violent incident was detected on one of your cameras. Tap to view the incident.",
-                            EventType = "violence_detected",
-                            IsActive = true,
-                            Title = "Violence Alert"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Body = "A warning event was detected on one of your cameras. Tap to view the incident.",
-                            EventType = "warning_detected",
-                            IsActive = true,
-                            Title = "Warning Alert"
-                        });
                 });
 
             modelBuilder.Entity("Vedect.Models.Domain.SubscriptionPlan", b =>
