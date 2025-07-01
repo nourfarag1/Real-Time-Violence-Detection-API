@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +11,25 @@ using Vedect.Data;
 using Vedect.Models.Domain;
 using Vedect.Repositories.Implementations;
 using Vedect.Repositories.Interfaces;
+using Vedect.Services.BackgroundServices;
 using Vedect.Services.Core;
+using Vedect.Services.Implementations;
+using Vedect.Services.Interfaces;
 using Vedect.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Initialize Firebase Admin SDK
+var firebaseKey = builder.Configuration["Firebase:ServiceAccountKey"];
+if (string.IsNullOrEmpty(firebaseKey))
+{
+    throw new InvalidOperationException("Firebase Service Account Key is not set in the configuration. Please set the 'Firebase:ServiceAccountKey' user secret.");
+}
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromJson(firebaseKey),
+});
 
 builder.Services.AddHttpClient();
 
@@ -29,6 +46,8 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddScoped<ICameraRepo, CameraRepo>();
 
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<JWTService>();
 
@@ -65,6 +84,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddTransient<IEmailSender, EmailSender>(); 
 builder.Services.AddTransient<IUserRegistrationService, UserRegistrationService>();
+builder.Services.AddScoped<INotificationService, FirebaseNotificationService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -118,6 +138,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Add services to the container.
+builder.Services.AddHttpClient("AiPipelineClient", client =>
+{
+    // Optional: Set a timeout
+    // client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddSingleton<Vedect.Services.Interfaces.IAiProcessingService, Vedect.Services.Implementations.AiProcessingService>();
+
+// Register the background service for consuming RabbitMQ notifications
+builder.Services.AddHostedService<NotificationConsumerService>();
 
 var app = builder.Build();
 
@@ -134,6 +164,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// UseDefaultFiles must be called before UseStaticFiles to serve the default file (e.g., index.html) for requests to the root URL.
+app.UseDefaultFiles(); 
+app.UseStaticFiles(); // This will serve files from wwwroot
 
 //app.UseHttpsRedirection();
 

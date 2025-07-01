@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.Net.WebSockets;
 using System.Security.Claims;
 using Vedect.Data;
@@ -77,5 +78,12 @@ namespace Vedect.Controllers
             return Ok(results);
         }
 
+        [HttpGet("CameraCount")]
+        public async Task<int> GetCameraCount(string userId)
+        {
+            var camerasList = await _camRepo.GetUserCameras(userId);
+
+            return camerasList.Count();
+        }
     }
 }

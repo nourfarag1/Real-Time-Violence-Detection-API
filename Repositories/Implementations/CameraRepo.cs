@@ -68,7 +68,7 @@ namespace Vedect.Repositories.Implementations
                 .Select(uc => uc.CameraId).ToListAsync();
 
             if (userCameras.Count == 0)
-                throw new InvalidOperationException("No cameras found");
+                return null;
 
             var cameras = new List<Camera>();
 
