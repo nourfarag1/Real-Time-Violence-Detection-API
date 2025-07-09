@@ -69,6 +69,7 @@ namespace Vedect.Controllers
                 var result = new GetUserCamerasRequest();
 
                 result.CameraName = cam.CameraName;
+                result.CameraId = cam.Id;
                 result.StreamUrl = cam.StreamUrl;
 
                 results.Add(result);

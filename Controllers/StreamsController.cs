@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Vedect.Data;
 using Vedect.Models.Domain;
 
@@ -12,11 +13,13 @@ namespace Vedect.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public StreamsController(AppDbContext context, IHttpClientFactory httpClientFactory)
+        public StreamsController(AppDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _context = context;
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         [HttpPost("{cameraId}/start")]
@@ -30,9 +33,15 @@ namespace Vedect.Controllers
                 .Where(s => s.CameraId == camera.Id && s.IsActive)
                 .FirstOrDefaultAsync();
 
+            var srsHost = _configuration["SrsHost"];
+            if (string.IsNullOrEmpty(srsHost))
+            {
+                return StatusCode(500, "SRS host not configured.");
+            }
+
             if (existingSession != null)
             {
-                var existingUrl = $"http://localhost:8080/live/{existingSession.StreamKey}.flv";
+                var existingUrl = $"{srsHost}/live/{existingSession.StreamKey}.flv";
                 return Ok(new { message = "Stream already active.", url = existingUrl });
             }
 
@@ -61,7 +70,7 @@ namespace Vedect.Controllers
             _context.CameraStreamsSessions.Add(session);
             await _context.SaveChangesAsync();
 
-            var streamUrl = $"http://localhost:8080/live/{streamKey}.flv";
+            var streamUrl = $"{srsHost}/live/{streamKey}.flv";
 
             return Ok(new
             {
