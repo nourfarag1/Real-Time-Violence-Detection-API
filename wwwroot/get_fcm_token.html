@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FCM Token Generator</title>
+</head>
+<body>
+
+<h1>FCM Token Generator</h1>
+<p>Open the browser's developer console (F12) to see the FCM token.</p>
+<button onclick="requestNotificationPermission()">Request Notification Permission & Get Token</button>
+<p><strong>Your FCM Token:</strong></p>
+<textarea id="fcm-token" rows="5" cols="100" readonly></textarea>
+
+<!-- Import the Firebase Core and Messaging SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
+
+<script>
+    // -------------------------------------------------------------------
+    // PASTE YOUR FIREBASE CONFIG OBJECT HERE
+    // -------------------------------------------------------------------
+    const firebaseConfig = {
+  apiKey: "AIzaSyDWbfpCEFlLqujx5fE8zyhR6IOs2ImDd5c",
+  authDomain: "notification-33c47.firebaseapp.com",
+  projectId: "notification-33c47",
+  storageBucket: "notification-33c47.firebasestorage.app",
+  messagingSenderId: "958685724214",
+  appId: "1:958685724214:web:dd887b473e28fd50ec2297",
+  measurementId: "G-FYTRYEPZ5X"
+};
+    // -------------------------------------------------------------------
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    function requestNotificationPermission() {
+        console.log('Requesting permission...');
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                
+                // Get the token
+                messaging.getToken({ vapidKey: 'BBCJ93K3RVOjioo3E-1K1f-wPAH_V54RRVWFItOv1hqIEiyvz46UUiE1TfG4HgsDa09tYmftVO9SU9kpNQ0-eoI' })
+                .then((currentToken) => {
+                    if (currentToken) {
+                        console.log('FCM Token:', currentToken);
+                        document.getElementById('fcm-token').value = currentToken;
+                    } else {
+                        console.log('No registration token available. Request permission to generate one.');
+                    }
+                }).catch((err) => {
+                    console.log('An error occurred while retrieving token. ', err);
+                });
+
+            } else {
+                console.log('Unable to get permission to notify.');
+            }
+        });
+    }
+</script>
+
+</body>
+</html> 

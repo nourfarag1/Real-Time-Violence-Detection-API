@@ -8,7 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using Vedect.Models.Domain;
 using Vedect.Models.DTOs;
-using Vedect.Services;
+using Vedect.Services.Core;
 using Vedect.Shared;
 
 namespace Vedect.Controllers

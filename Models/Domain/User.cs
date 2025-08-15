@@ -16,5 +16,9 @@ namespace Vedect.Models.Domain
 
         public int SubscriptionPlanId { get; set; }
         public SubscriptionPlan SubscriptionPlan { get; set; } = null!;
+
+        public ICollection<UserCamera> UserCameras { get; set; } = new List<UserCamera>();
+        
+        public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
     }
 }

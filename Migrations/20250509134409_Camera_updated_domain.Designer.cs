@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vedect.Data;
 
@@ -11,9 +12,11 @@ using Vedect.Data;
 namespace Vedect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509134409_Camera_updated_domain")]
+    partial class Camera_updated_domain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,15 +31,40 @@ namespace Vedect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AuthSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AuthType")
+                        .HasColumnType("int");
+
                     b.Property<string>("CameraName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StreamUrl")
+                    b.Property<int>("CameraType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IngestPort")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastChecked")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MacAddress")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("StreamURL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MacAddress")
+                        .IsUnique()
+                        .HasFilter("[MacAddress] IS NOT NULL");
 
                     b.ToTable("Cameras");
                 });
@@ -172,113 +200,6 @@ namespace Vedect.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Vedect.Models.Domain.AiProcessingSession", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CameraId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ErrorDetails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastMessageFromPipeline")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AiProcessingSessions");
-                });
-
-            modelBuilder.Entity("Vedect.Models.Domain.CameraStreamSession", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CameraId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StreamKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CameraId");
-
-                    b.ToTable("CameraStreamsSessions");
-                });
-
-            modelBuilder.Entity("Vedect.Models.Domain.NotificationTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NotificationTemplates");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Body = "A violent incident was detected on one of your cameras. Tap to view the incident.",
-                            EventType = "violence_detected",
-                            IsActive = true,
-                            Title = "Violence Alert"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Body = "A warning event was detected on one of your cameras. Tap to view the incident.",
-                            EventType = "warning_detected",
-                            IsActive = true,
-                            Title = "Warning Alert"
-                        });
                 });
 
             modelBuilder.Entity("Vedect.Models.Domain.SubscriptionPlan", b =>
@@ -477,32 +398,6 @@ namespace Vedect.Migrations
                     b.ToTable("UserCameras");
                 });
 
-            modelBuilder.Entity("Vedect.Models.Domain.UserDevice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FcmToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserDevices");
-                });
-
             modelBuilder.Entity("Vedect.Models.Domain.UserPlanRequests", b =>
                 {
                     b.Property<int>("Id")
@@ -593,17 +488,6 @@ namespace Vedect.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vedect.Models.Domain.CameraStreamSession", b =>
-                {
-                    b.HasOne("Camera", "Camera")
-                        .WithMany()
-                        .HasForeignKey("CameraId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Camera");
-                });
-
             modelBuilder.Entity("Vedect.Models.Domain.User", b =>
                 {
                     b.HasOne("Vedect.Models.Domain.SubscriptionPlan", "SubscriptionPlan")
@@ -630,17 +514,6 @@ namespace Vedect.Migrations
                         .IsRequired();
 
                     b.Navigation("Camera");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Vedect.Models.Domain.UserDevice", b =>
-                {
-                    b.HasOne("Vedect.Models.Domain.User", "User")
-                        .WithMany("Devices")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -677,8 +550,6 @@ namespace Vedect.Migrations
 
             modelBuilder.Entity("Vedect.Models.Domain.User", b =>
                 {
-                    b.Navigation("Devices");
-
                     b.Navigation("UserCameras");
                 });
 #pragma warning restore 612, 618
