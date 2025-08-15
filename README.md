@@ -2,9 +2,6 @@
 
 > A multi-service backend system that analyzes live video streams using a hybrid cloud/local AI pipeline to detect and report violent incidents in real-time.
 
-![Project Demo GIF](./demo.gif)
-*Live demo showing a notification being triggered after a violent act is detected.*
-
 ---
 
 ## About The Project
