@@ -42,9 +42,18 @@ This project is composed of two essential repositories. Both must be cloned for 
 
 ## System Architecture
 
-(Your diagram sections remain here, unchanged)
+The system is designed as a distributed set of services to handle the real-time processing demands. The architecture can be understood at two levels: the high-level process flow and the detailed component interaction.
+
+### High-Level Process Flow
+
+This diagram illustrates the end-to-end journey, from a user initiating a stream to receiving a real-time alert. It shows the clear separation of responsibilities between the mobile client, the .NET orchestrator, the AI pipeline, and the underlying infrastructure.
 
 ![High-Level Process Flow](./high-level-flow.png)
+
+### Detailed Component Architecture
+
+This diagram provides a more granular view of the services running within the Docker environment. It details the individual microservices, the specific communication protocols used (RTMP, AMQP, HTTP), and the flow of data between the message broker (RabbitMQ) and object storage (MinIO).
+
 ![Detailed Component Architecture](./component-architecture.png)
 
 ## Getting Started
